@@ -1,0 +1,27 @@
+#ifndef MAINVIEW_H
+#define MAINVIEW_H
+
+#include <QMainWindow>
+
+namespace Ui {
+    class MainView;
+}
+
+namespace CANMonitor
+{
+    class SetupTab;
+
+    class MainView : public QMainWindow
+    {
+        Q_OBJECT
+
+    public:
+        explicit MainView(QWidget *parent, CANMonitor::SetupTab &setup);
+        ~MainView();
+
+    private:
+        SetupTab& mSetupTab;
+        Ui::MainView *ui;
+    };
+}
+#endif // MAINVIEW_H
