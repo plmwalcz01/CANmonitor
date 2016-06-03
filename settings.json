@@ -1,0 +1,19 @@
+{
+  "applicationTitle": "CANMonitor",
+  "baudRate": "115200",
+  "samplingpoint": 10,
+  "highSpeed": 115200,
+  "mediumSpeed": 57600,
+  "lowSpeed": 38400,
+  "busClock": 50,
+  "canMessages": [
+    "00000000",
+    "00000001",
+    "00000010",
+    "00000100",
+    "00001000",
+    "00010000",
+    "00100000",
+    "01000000",
+    "10000000"]
+}
