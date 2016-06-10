@@ -12,6 +12,7 @@ namespace CANMonitor
         QObject(parent), mFoundDevices(*new QStringListModel(this))
     {
         checkAvailableUSBPorts();
+        mReadBuffer.resize(64);
     }
 
     CANSocket::~CANSocket()
@@ -37,7 +38,7 @@ namespace CANMonitor
     {
         inputFile = new QFile(device);
 
-        if(!inputFile->open(QFile::ReadOnly))
+        if(!inputFile->open(QFile::ReadWrite))
         {
             std::cout << "Cant open!" << qPrintable(device);
             std::cout << qPrintable(inputFile->errorString()) ;
@@ -45,10 +46,52 @@ namespace CANMonitor
         }
 
         mSNRead = new QSocketNotifier(inputFile->handle(), QSocketNotifier::Read);
+        mSNWrite = new QSocketNotifier(inputFile->handle(), QSocketNotifier::Write);
         mSNRead->setEnabled(true);
-        QObject::connect(mSNRead, SIGNAL(activated(int)), this, SLOT(readyRead()));
+        QObject::connect(mSNRead, SIGNAL(activated(int)), this , SLOT(readyRead()));
+        QObject::connect(mSNWrite, SIGNAL(activated(int)), this , SLOT(readySend()));
+        QObject::connect( this , SIGNAL(DidWriting(int)), mSNWrite, SIGNAL(activated(int)));
+        isConnected = true;
         emit NotifyConnected();
+
         return true;
+    }
+
+    void CANSocket::readySend()
+    {
+
+        qDebug() << "ready send";
+        mSNWrite->setEnabled(false);
+        mSNRead->setEnabled(true);
+    }
+
+    void CANSocket::readyRead()
+    {
+        if(isConnected)
+        {
+            quint64 max_size = 64;
+            inputFile->read(mReadBuffer.data(),max_size);
+            emit NotifyReadData(mReadBuffer);
+        }
+    }
+    void CANSocket::onDataRecived(QByteArray data)
+    {
+        emit NotifyReadData(data);
+    }
+
+    void CANSocket::onSendDataRequest(QString dataToSend)
+    {
+        mSNRead->setEnabled(false);
+        mSNWrite->setEnabled(true);
+        qDebug() << "socket: " + dataToSend ;
+        QByteArray data(dataToSend.toStdString().c_str());
+        int res = inputFile->write(data.data(), data.length());
+        qDebug() << "result: " << res;
+        if(res != -1)
+        {
+            emit DidWriting(inputFile->handle());
+            emit NotifyDataSend(dataToSend);
+        }
     }
 
     bool CANSocket::IsReadyForConnection()
@@ -64,19 +107,25 @@ namespace CANMonitor
     }
     void CANSocket::Disconnect()
     {
-        mSNRead->setEnabled(false);
-        if(inputFile->isOpen())
+        if(isConnected)
         {
-            inputFile->close();
-            qDebug() << "File successfully closed";
+            mSNRead->setEnabled(false);
+            mSNWrite->setEnabled(false);
+            if(inputFile->isOpen())
+            {
+                inputFile->close();
+                qDebug() << "File successfully closed";
+            }
+            isConnected=false;
+            emit NotifyDisconnected();
         }
-        emit NotifyDisconnected();
-    }
-    void CANSocket::readyRead()
-    {
-        mReadBuffer = inputFile->read(8);
-        mReadData = mReadBuffer.toHex();
-        emit NotifyReadData(mReadData);
+        else
+        {
+            QString msg = "Already disconected";
+            emit NotifyStatusChanged(msg);
+        }
+
+
     }
 
     void CANSocket::onRefreshDevices()
@@ -94,7 +143,8 @@ namespace CANMonitor
 
         /* Create the udev object */
         udev = udev_new();
-        if (!udev) {
+        if (!udev)
+        {
             qDebug() << ("Can't create udev\n");
             return false;
         }
@@ -105,11 +155,6 @@ namespace CANMonitor
         udev_enumerate_scan_devices(enumerate);
         devices = udev_enumerate_get_list_entry(enumerate);
 
-        /* For each item enumerated, print out its information.
-           udev_list_entry_foreach is a macro which expands to
-           a loop. The loop will be executed for each member in
-           devices, setting dev_list_entry to a list entry
-           which contains the device's path in /sys. */
         udev_list_entry_foreach(dev_list_entry, devices) {
             const char *path;
 
@@ -120,35 +165,15 @@ namespace CANMonitor
 
             /* usb_device_get_devnode() returns the path to the device node
                itself in /dev. */
-            printf("Device Node Path: %s\n", udev_device_get_devnode(dev));
             devicesList.append(udev_device_get_devnode(dev));
-
-
-            /* The device pointed to by dev contains information about
-               the hidraw device. In order to get information about the
-               USB device, get the parent device with the
-               subsystem/devtype pair of "usb"/"usb_device". This will
-               be several levels up the tree, but the function will find
-               it.*/
             dev = udev_device_get_parent_with_subsystem_devtype(
-                   dev,
-                   "usb",
-                   "usb_device");
+                        dev,
+                        "usb",
+                        "usb_device");
             if (!dev) {
-                printf("Unable to find parent usb device.");
+                qDebug() << ("Unable to find parent usb device.");
                 exit(1);
             }
-
-            /* From here, we can call get_sysattr_value() for each file
-               in the device's /sys entry. The strings passed into these
-               functions (idProduct, idVendor, serial, etc.) correspond
-               directly to the files in the directory which represents
-               the USB device. Note that USB strings are Unicode, UCS2
-               encoded, but the strings returned from
-               udev_device_get_sysattr_value() are UTF-8 encoded. */
-            printf("  %s\n  %s\n",
-                    udev_device_get_sysattr_value(dev,"manufacturer"),
-                    udev_device_get_sysattr_value(dev,"product"));
             mFoundDevices.setStringList(devicesList);
             udev_device_unref(dev);
         }
@@ -158,4 +183,5 @@ namespace CANMonitor
         emit NotifyDevicesFound();
         return true;
     }
+
 }

@@ -7,16 +7,21 @@
 #include "Model/cansocket.h"
 #include "Model/device.h"
 #include "ViewMgr/setubtabviewmanager.h"
+#include "View/controltab.h"
+#include "ViewMgr/controltabviewmanager.h"
 
 namespace CANMonitor
 {
     Startup::Startup() :
         QObject(nullptr),
         mSetupTab(*new SetupTab(nullptr)),
-        mMainView(*new MainView(nullptr, mSetupTab)),
-        mDevicePtr(new Device(this, *new CANSocket(this) )),
-        mSetupViewMgr(new SetuptabViewManager(this, mSetupTab, *mDevicePtr, provider::GetSettingsAsSingleton()))
+        mControlTab(*new ControlTab(nullptr)),
+        mMainView(*new MainView(nullptr, mSetupTab, mControlTab)),
+        mDevicePtr(new Device(this)),
+        mSetupViewMgr(new SetuptabViewManager(this, mSetupTab, *mDevicePtr, provider::GetSettingsAsSingleton())),
+        mControlTabMgr(new ControlTabViewManager(this, mControlTab, *mDevicePtr, provider::GetSettingsAsSingleton()))
     {
+        mDevicePtr->Disconnect();
     }
 
     Startup::~Startup()

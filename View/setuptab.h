@@ -24,6 +24,7 @@ namespace CANMonitor
         void setSamplingPoint(const int& samplingPoint);
         void setFoundDevices(QStringListModel &devices);
         void setCommands(QStringListModel& commands);
+
     public slots:
         void onStatusUpdated(const QString &statusMsg);
         void onFoundDevices(QStringListModel &devices);
@@ -31,15 +32,10 @@ namespace CANMonitor
         void onDisonnected();
         void onDataSend(const QString& dataSend);
         void onDataRecived(const QString& dataRecived);
-    signals:
-        void NotifyBaudRateChanged(const QString& baudRate);
-        void NotifySamplingPointChanged(int samplingPoint);
-        void NotifyRefreshDevices();
-        void NotifyConnectedClicked(const QString &selectedDevice);
-        void NotifyDisconnectedClicked();
-        void NotifySendClicked(const QString& messageToSend);
-        void NotifyReciveClicked();
-
+        void onConnectedEnabled(bool isEnabled);
+        void onDisconnectedEnabled(bool isEnabled);
+        void onMessagesEnabled(bool isEnabled);
+        void onControlTabEnabled(bool isEnabled);
 
     private slots:
         void on_editBaudRate_editingFinished();
@@ -50,6 +46,16 @@ namespace CANMonitor
         void on_btnClear_clicked();
         void on_btnSend_clicked();
         void on_btnReceive_clicked();
+
+
+    signals:
+        void NotifyBaudRateChanged(const QString& baudRate);
+        void NotifySamplingPointChanged(int samplingPoint);
+        void NotifyRefreshDevices();
+        void NotifyConnectedClicked(const QString &selectedDevice);
+        void NotifyDisconnectedClicked();
+        void NotifySendClicked(const QString& messageToSend);
+        void NotifyReciveClicked();
 
     private:
         int recCount = 0;

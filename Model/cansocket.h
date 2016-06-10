@@ -11,14 +11,20 @@
 #include <QPair>
 #include <QStringListModel>
 
+
 namespace CANMonitor{
+
     class CANSocket : public QObject
     {
         Q_OBJECT
     public:
+
         explicit CANSocket(QObject *parent=0);
         QFile *inputFile;
         QPointer<QSocketNotifier> mSNRead = nullptr;
+        QPointer<QSocketNotifier> mSNWrite = nullptr;
+
+        bool isConnected = false;
 
         QString mLastPluggedDevice;
         bool Connect();
@@ -32,14 +38,21 @@ namespace CANMonitor{
         QString getReadDataAsQString();
         QStringListModel &getFoundDevices();
         bool checkAvailableUSBPorts();
+
     public slots:
         void readyRead();
         void onRefreshDevices();
+        void onDataRecived(QByteArray data);
+        void onSendDataRequest(QString dataToSend);
+        void readySend();
     signals:
         void NotifyDevicesFound();
-        void NotifyReadData(QString &readData);
+        void NotifyReadData(QByteArray readData);
+        void NotifyStatusChanged(QString &statusMsg);
+        void NotifyDataSend(const QString &dataSend);
         void NotifyConnected();
         void NotifyDisconnected();
+        void DidWriting(int ok);
 
 
     private slots:

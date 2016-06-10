@@ -66,21 +66,36 @@ namespace CANMonitor
 
     void SetupTab::onDataSend(const QString &dataSend)
     {
+        qDebug() << "setubtab: " + dataSend;
         QString tmpStr = ("send: " + dataSend);
         ui->editCANMessages->append(tmpStr);
     }
 
     void SetupTab::onDataRecived(const QString &dataRecived)
     {
-        recCount++;
-        mtmpString.append(dataRecived + "\n");
-        if(recCount == 20)
-        {
-            ui->editCANMessages->append(mtmpString);
-            mtmpString.clear();
-            recCount=0;
-        }
+            ui->editCANMessages->append(dataRecived);
     }
+
+    void SetupTab::onConnectedEnabled(bool isEnabled)
+    {
+        ui->btnConnect->setEnabled(isEnabled);
+    }
+
+    void SetupTab::onDisconnectedEnabled(bool isEnabled)
+    {
+        ui->btnDisconnect->setEnabled(isEnabled);
+    }
+
+    void SetupTab::onMessagesEnabled(bool isEnabled)
+    {
+        ui->gbMessage->setEnabled(isEnabled);
+    }
+
+    void SetupTab::onControlTabEnabled(bool isEnabled)
+    {
+        (void) isEnabled;
+    }
+
     void SetupTab::on_editBaudRate_editingFinished()
     {
         emit NotifyBaudRateChanged(ui->editBaudRate->text());

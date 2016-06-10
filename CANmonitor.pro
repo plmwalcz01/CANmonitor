@@ -22,7 +22,9 @@ SOURCES += main.cpp\
     Model/provider.cpp \
     Model/cansocket.cpp \
     Model/device.cpp \
-    ViewMgr/setubtabviewmanager.cpp
+    ViewMgr/setubtabviewmanager.cpp \
+    View/controltab.cpp \
+    ViewMgr/controltabviewmanager.cpp
 
 HEADERS  += View/mainview.h \
     View/setuptab.h \
@@ -32,10 +34,14 @@ HEADERS  += View/mainview.h \
     Model/provider.h \
     Model/cansocket.h \
     Model/device.h \
-    ViewMgr/setubtabviewmanager.h
+    ViewMgr/setubtabviewmanager.h \
+    ViewMgr/controltabviewmanager.h \
+    View/controltab.h \
+    Model/canframeformat.h
 
 FORMS    += View/mainview.ui \
-    View/setuptab.ui
+    View/setuptab.ui \
+    View/controltab.ui
 
 RESOURCES += \
     CANmonitor_resources.qrc

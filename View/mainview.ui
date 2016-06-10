@@ -14,11 +14,11 @@
    <string>CANmonitor</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
      <widget class="QTabWidget" name="MainView_2">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabControl">
        <attribute name="title">
@@ -26,7 +26,11 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <layout class="QVBoxLayout" name="lo"/>
+         <layout class="QVBoxLayout" name="lo">
+          <item>
+           <layout class="QVBoxLayout" name="loControlTab"/>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>

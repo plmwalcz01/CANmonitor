@@ -69,7 +69,7 @@
           <item>
            <widget class="QLabel" name="lblBussSpeed">
             <property name="text">
-             <string>&amp;Baud Rate bit/s</string>
+             <string>&amp;Baud Rate baud/s</string>
             </property>
             <property name="buddy">
              <cstring>editBaudRate</cstring>
@@ -336,7 +336,13 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <widget class="QTextEdit" name="editCANMessages"/>
+         <widget class="QTextEdit" name="editCANMessages">
+          <property name="font">
+           <font>
+            <family>Monospace</family>
+           </font>
+          </property>
+         </widget>
         </item>
         <item alignment="Qt::AlignTop">
          <widget class="QPushButton" name="btnClear">
