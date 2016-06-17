@@ -84,7 +84,12 @@ namespace CANMonitor
         mSNRead->setEnabled(false);
         mSNWrite->setEnabled(true);
         qDebug() << "socket: " + dataToSend ;
-        QByteArray data(dataToSend.toStdString().c_str());
+        QByteArray data(64, '0');
+        QByteArray tmpData(dataToSend.toStdString().c_str());
+        if(tmpData.size() < 64)
+        {
+            data.replace(0, tmpData.size(), tmpData);
+        }
         int res = inputFile->write(data.data(), data.length());
         qDebug() << "result: " << res;
         if(res != -1)

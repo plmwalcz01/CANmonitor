@@ -40,8 +40,8 @@ namespace CANMonitor
         canBaseFrameFormat canFrame;
         memset (&canFrame, 0, sizeof(canFrame));
         //u_int8_t index = 0; can be used to keep track what part of frame is currently parsed/translated
-        canFrame.IDE = ((*frame.data() >> 5) & 0x01);
         canFrame.DLC = ((*frame.data() ) & 0x0F);
+        canFrame.IDE = ((*frame.data() >> 5) & 0x01);
         if(!canFrame.IDE)
         {
             canFrame.canID = static_cast<u_int8_t>((*(frame.data()+1)));
